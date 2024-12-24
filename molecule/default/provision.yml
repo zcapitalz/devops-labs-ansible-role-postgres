@@ -1,0 +1,10 @@
+- name: Add hostname entries to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - "192.168.56.1 postgres1"
+    - "192.168.56.2 postgres2"
+    - "192.168.56.3 etcd_load_balancer"
+  become: true

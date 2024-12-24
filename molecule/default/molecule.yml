@@ -1,0 +1,52 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+
+driver:
+  name: vagrant
+
+platforms:
+  - name: postgres1
+    box: ubuntu/focal64
+    hostname: postgres1
+    groups:
+      - postgres
+      - etcd
+    interfaces:
+        - network_name: private_network
+          type: static
+          ip: 192.168.56.1
+          auto_config: true
+
+  - name: postgres2
+    box: ubuntu/focal64
+    hostname: postgres2
+    groups:
+      - postgres
+      - etcd
+    interfaces:
+        - network_name: private_network
+          type: static
+          ip: 192.168.56.2
+          auto_config: true
+
+  - name: balancer
+    box: ubuntu/focal64
+    hostname: balancer
+    groups:
+      - etcd_load_balancer
+    interfaces:
+        - network_name: private_network
+          type: static
+          ip: 192.168.56.3
+          auto_config: true
+
+scenario:
+  test_sequence:
+    - destroy
+    - create
+    - converge
+    - verify
+    - destroy

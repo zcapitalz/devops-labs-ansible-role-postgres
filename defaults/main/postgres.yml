@@ -1,0 +1,4 @@
+postgres_major_version: 16
+postgres_replicator_password: patroni
+postgres_rewind_user_password: patroni
+postgres_admin_password: ""

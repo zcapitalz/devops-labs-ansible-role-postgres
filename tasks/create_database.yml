@@ -1,0 +1,21 @@
+- name: Create new database
+  become: true
+  become_method: sudo
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    login_password: "{{ postgres_admin_password }}"
+    name: "{{ postgres_new_database }}"
+
+- name: Grant all privileges for new database to specified users
+  become: true
+  become_method: sudo
+  become_user: postgres
+  community.postgresql.postgresql_privs:
+    db: postgres
+    login_password: "{{ postgres_admin_password }}"
+    privs: ALL
+    type: database
+    obj: "{{ postgres_new_database }}"
+    role: "{{ item }}"
+  loop: "{{ postgres_new_database_users_granted }}"
+  when: postgres_new_database_users_granted is defined

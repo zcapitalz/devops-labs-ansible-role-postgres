@@ -1,0 +1,16 @@
+---
+- name: Install apt dependencies
+  package:
+    name:
+      - jq
+    state: present
+  become: true
+
+- name: Register patroni cluster leader as fact
+  shell: |
+    curl -s http://localhost:2379/v2/keys/service/{{ postgres_patroni_cluster_name }}/leader | jq -r .node.value
+  register: postgres_patroni_cluster_leader_result
+
+- name: Register patroni cluster leader as fact
+  set_fact:
+    postgres_patroni_cluster_leader: "{{ postgres_patroni_cluster_leader_result.stdout }}"

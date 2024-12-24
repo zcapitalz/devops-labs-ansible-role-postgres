@@ -1,0 +1,77 @@
+---
+- name: Prepare VMs
+  hosts: all
+  gather_facts: false
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/provision.yml"
+
+- name: Install PostgreSQL
+  hosts: postgres
+  gather_facts: false
+  vars_files:
+    - "{{ playbook_dir }}/../../defaults/main/postgres.yml"
+    - "{{ playbook_dir }}/../../vars/main/postgres.yml"
+    - "{{ playbook_dir }}/vars/postgres.yml"
+  vars:
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/../../tasks/install_postgres.yml"
+
+- name: Run etcd cluster
+  hosts: etcd
+  gather_facts: false
+  vars_files:
+    - "{{ playbook_dir }}/../../defaults/main/etcd.yml"
+    - "{{ playbook_dir }}/../../vars/main/etcd.yml"
+  vars:
+    postgres_etcd_network_interface: enp0s8
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/../../tasks/run_etcd.yml"
+
+- name: Run load balancer for etcd cluster
+  hosts: etcd_load_balancer
+  gather_facts: false
+  vars:
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/../../tasks/run_etcd_load_balancer.yml"
+
+- name: Run patroni
+  hosts: postgres
+  gather_facts: false
+  vars_files:
+    - "{{ playbook_dir }}/../../defaults/main/postgres.yml"
+    - "{{ playbook_dir }}/../../defaults/main/patroni.yml"
+    - "{{ playbook_dir }}/../../vars/main/postgres.yml"
+    - "{{ playbook_dir }}/vars/postgres.yml"
+  vars:
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/../../tasks/run_patroni.yml"
+
+- name: Change data directory
+  hosts: postgres
+  gather_facts: false
+  vars:
+    postgres_data_directory_path: /custom/location/postgresql/16/main
+  vars_files:
+    - "{{ playbook_dir }}/../../defaults/main/postgres.yml"
+    - "{{ playbook_dir }}/../../defaults/main/patroni.yml"
+    - "{{ playbook_dir }}/../../vars/main/postgres.yml"
+    - "{{ playbook_dir }}/vars/postgres.yml"
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/../../tasks/change_data_dir.yml"
+
+- name: Create new PostgreSQL user and database
+  hosts: postgres
+  gather_facts: false
+  vars_files:
+    - "{{ playbook_dir }}/../../defaults/main/postgres.yml"
+    - "{{ playbook_dir }}/../../defaults/main/patroni.yml"
+    - "{{ playbook_dir }}/../../vars/main/postgres.yml"
+    - "{{ playbook_dir }}/vars/postgres.yml"
+  vars:
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/../../tasks/get_patroni_leader.yml"
+
+    - import_tasks: "{{ playbook_dir }}/../../tasks/create_database.yml"
+      when: inventory_hostname == postgres_patroni_cluster_leader
+    - import_tasks: "{{ playbook_dir }}/../../tasks/create_user.yml"
+      when: inventory_hostname == postgres_patroni_cluster_leader

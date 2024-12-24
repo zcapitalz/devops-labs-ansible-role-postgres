@@ -1,0 +1,44 @@
+---
+- name: Install apt dependencies
+  package:
+    name:
+      - postgresql-common
+      - libpq-dev
+      - acl
+    state: present
+    update_cache: true
+  become: true
+
+- name: Disable automatic PostgreSQL main cluster creation
+  shell: |
+    sed -ri 's/#(create_main_cluster) .*$/\1 = false/' /etc/postgresql-common/createcluster.conf
+  become: true
+
+- name: Add PostgreSQL repository
+  shell: |
+    sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+  become: true
+
+- name: Install PostgreSQL
+  package:
+    name: 
+      - "postgresql-{{ postgres_major_version }}"
+      - "postgresql-client-{{ postgres_major_version }}"
+      - "postgresql-contrib-{{ postgres_major_version }}"
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install pip
+  package:
+    name: python3-pip
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install psycopg2 pip package
+  pip:
+    name:
+      - psycopg2
+    executable: pip3
+  become: true
