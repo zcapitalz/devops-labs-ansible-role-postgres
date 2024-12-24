@@ -12,7 +12,6 @@
     - "{{ playbook_dir }}/../../defaults/main/postgres.yml"
     - "{{ playbook_dir }}/../../vars/main/postgres.yml"
     - "{{ playbook_dir }}/vars/postgres.yml"
-  vars:
   tasks:
     - import_tasks: "{{ playbook_dir }}/../../tasks/install_postgres.yml"
 
@@ -30,7 +29,6 @@
 - name: Run load balancer for etcd cluster
   hosts: etcd_load_balancer
   gather_facts: false
-  vars:
   tasks:
     - import_tasks: "{{ playbook_dir }}/../../tasks/run_etcd_load_balancer.yml"
 
@@ -42,7 +40,6 @@
     - "{{ playbook_dir }}/../../defaults/main/patroni.yml"
     - "{{ playbook_dir }}/../../vars/main/postgres.yml"
     - "{{ playbook_dir }}/vars/postgres.yml"
-  vars:
   tasks:
     - import_tasks: "{{ playbook_dir }}/../../tasks/run_patroni.yml"
 
@@ -67,7 +64,6 @@
     - "{{ playbook_dir }}/../../defaults/main/patroni.yml"
     - "{{ playbook_dir }}/../../vars/main/postgres.yml"
     - "{{ playbook_dir }}/vars/postgres.yml"
-  vars:
   tasks:
     - import_tasks: "{{ playbook_dir }}/../../tasks/get_patroni_leader.yml"
 
