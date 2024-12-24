@@ -6,7 +6,7 @@ restapi:
   connect_address: {{ inventory_hostname }}:8008
  
 etcd:
-  host: etcd_load_balancer:2379
+  host: {{ postgres_etcd_load_balancer_host }}:2379
  
 bootstrap:
   dcs:

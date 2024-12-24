@@ -1,2 +1,3 @@
 postgres_etcd_version: 3.5.17
 postgres_etcd_initial_cluster_token: 1HCpXwx2EK9oYluWbacgeCnFcLf
+postgres_etcd_load_balancer_host: etcd_load_balancer
